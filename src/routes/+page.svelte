@@ -4,6 +4,8 @@
 
 	let content = '';
 	let errorCorrectionLevel = 'H';
+  let colorDark = '#000000';
+  let colorLight = '#ffffff';
 
 	let qrUrl: string;
 
@@ -12,7 +14,11 @@
 			QRCode.toDataURL(
 				content,
 				{
-					errorCorrectionLevel: errorCorrectionLevel as QRCodeErrorCorrectionLevel
+					errorCorrectionLevel: errorCorrectionLevel as QRCodeErrorCorrectionLevel,
+          color: {
+            dark: colorDark,
+            light: colorLight
+          }
 				},
 				(err, url) => {
 					if (err) console.error(err);
@@ -48,5 +54,9 @@
 			<option value="Q">Q - 25%</option>
 			<option value="H">H - 30%</option>
 		</select>
+    <div class="flex flex-row gap-4">
+      <input type="color" bind:value={colorDark} class="w-full rounded-lg bg-stone-50" />
+      <input type="color" bind:value={colorLight} class="w-full rounded-lg bg-stone-50" />
+    </div>
 	</section>
 </main>
