@@ -1,7 +1,26 @@
-<script>
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
+<script lang="ts">
+	import type { QRCodeErrorCorrectionLevel } from 'qrcode';
+	import QRCode from 'qrcode';
+
+	let content = '';
+	let errorCorrectionLevel = 'H';
+
+	let qrUrl: string;
+
+	$: {
+		if (content.length > 0) {
+			QRCode.toDataURL(
+				content,
+				{
+					errorCorrectionLevel: errorCorrectionLevel as QRCodeErrorCorrectionLevel
+				},
+				(err, url) => {
+					if (err) console.error(err);
+					qrUrl = url;
+				}
+			);
+		}
+	}
 </script>
 
 <svelte:head>
@@ -9,51 +28,25 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
-<section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
-
-		to your new<br />SvelteKit app
-	</h1>
-
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
-</section>
-
-<style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-	}
-
-	h1 {
-		width: 100%;
-	}
-
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
-	}
-</style>
+<main class="w-full h-full flex flex-row gap-4">
+	<section class="flex-1 p-4">
+		{#if qrUrl}
+			<img
+				src={qrUrl}
+				alt="The generated QR code"
+				class="w-full h-full aspect-square object-contain"
+				style="image-rendering: pixelated"
+			/>
+		{/if}
+	</section>
+	<section class="w-96 p-4 bg-stone-300 flex flex-col gap-4">
+		<h1 class="text-2xl font-bold">QR Coder</h1>
+		<textarea bind:value={content} class="w-full p-4 rounded-lg bg-stone-50" />
+		<select bind:value={errorCorrectionLevel} class="w-full rounded-lg px-4 py-2 bg-stone-50">
+			<option value="L">L - 7%</option>
+			<option value="M">M - 15%</option>
+			<option value="Q">Q - 25%</option>
+			<option value="H">H - 30%</option>
+		</select>
+	</section>
+</main>
